@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioP — Predict. Prevent. Protect.</title>
+<meta name="description" content="CardioP is a digital health platform focused on reducing preventable cardiovascular disease and improving cardiovascular wellness across Africa, starting with Nigeria.">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-500-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-600-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-700-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/latin-800-normal.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'cardio-red': '#880808',
+        'cardio-teal': '#0E7C7B',
+        'cardio-dark': '#1A1A1A',
+        'cardio-light': '#FAFAF8',
+        'cardio-gray': '#6B6B6B',
+      },
+      fontFamily: {
+        'agrandir': ['"Plus Jakarta Sans"', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --cardio-red: #880808;
+    --cardio-teal: #0E7C7B;
+    --cardio-dark: #1A1A1A;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--cardio-dark);
+    background: #FFFFFF;
+    overflow-x: hidden;
+  }
+  @keyframes ecgPulse { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .ecg-line { animation: ecgPulse 3s linear infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.9; } }
+  .pulse-anim { animation: pulse 2s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .float-anim { animation: float 4s ease-in-out infinite; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in-up { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+  @keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+  .slide-in-left { opacity: 0; transform: translateX(-40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  .slide-in-left.visible { opacity: 1; transform: translateX(0); }
+  @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  .slide-in-right { opacity: 0; transform: translateX(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  .slide-in-right.visible { opacity: 1; transform: translateX(0); }
+  @keyframes heartbeat { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.1); } 28% { transform: scale(1); } 42% { transform: scale(1.1); } 56% { transform: scale(1); } }
+  .heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
+  @keyframes typing { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+  .typing-dot { animation: typing 1.4s ease-in-out infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes ripple { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+  .ripple { animation: ripple 2s ease-out infinite; }
+  .ripple:nth-child(2) { animation-delay: 0.5s; }
+  .ripple:nth-child(3) { animation-delay: 1s; }
+  .gradient-hero { background: linear-gradient(135deg, #1A1A1A 0%, #2D0A0A 50%, #0A2D2D 100%); }
+  .gradient-red { background: linear-gradient(135deg, #880808 0%, #A01010 100%); }
+  .gradient-teal { background: linear-gradient(135deg, #0E7C7B 0%, #12A09F 100%); }
+  .gradient-mixed { background: linear-gradient(135deg, #880808 0%, #0E7C7B 100%); }
+  .card-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(136, 8, 8, 0.12); }
+  .nav-link { position: relative; transition: color 0.3s ease; }
+  .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--cardio-red); transition: width 0.3s ease; }
+  .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+  .btn-primary { background: var(--cardio-red); color: white; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 15px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
+  .btn-primary:hover { background: #A01010; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(136, 8, 8, 0.3); }
+  .btn-secondary { background: transparent; color: var(--cardio-dark); padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 15px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; border: 2px solid #E5E5E5; cursor: pointer; }
+  .btn-secondary:hover { border-color: var(--cardio-teal); color: var(--cardio-teal); transform: translateY(-2px); }
+  .btn-secondary-dark { background: transparent; color: white; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 15px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; }
+  .btn-secondary-dark:hover { border-color: white; background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+  .tab-btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; cursor: pointer; border: none; background: transparent; color: var(--cardio-gray); }
+  .tab-btn.active { background: var(--cardio-red); color: white; }
+  .tab-btn:hover:not(.active) { background: #F5F5F5; color: var(--cardio-dark); }
+  .chat-bubble { max-width: 80%; padding: 14px 18px; border-radius: 18px; font-size: 14px; line-height: 1.6; animation: fadeInUp 0.4s ease; }
+  .chat-bubble-user { background: var(--cardio-red); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .chat-bubble-bot { background: #F3F4F6; color: var(--cardio-dark); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .phone-mockup { background: #1A1A1A; border-radius: 36px; padding: 12px; box-shadow: 0 40px 80px rgba(0,0,0,0.2); }
+  .phone-screen { background: white; border-radius: 26px; overflow: hidden; }
+  .scroll-indicator { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); animation: float 2s ease-in-out infinite; }
+  .form-input { width: 100%; padding: 14px 18px; border: 2px solid #E5E5E5; border-radius: 12px; font-size: 15px; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; background: white; }
+  .form-input:focus { outline: none; border-color: var(--cardio-teal); box-shadow: 0 0 0 4px rgba(14, 124, 123, 0.1); }
+  .form-input.error { border-color: var(--cardio-red); box-shadow: 0 0 0 4px rgba(136, 8, 8, 0.1); }
+  .mobile-menu { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  .mobile-menu.open { transform: translateX(0); }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeInUp 0.5s ease; }
+  .bg-pattern { background-image: radial-gradient(circle at 1px 1px, rgba(14, 124, 123, 0.05) 1px, transparent 0); background-size: 40px 40px; }
+  .stagger-1 { transition-delay: 0.1s; }
+  .stagger-2 { transition-delay: 0.2s; }
+  .stagger-3 { transition-delay: 0.3s; }
+  .stagger-4 { transition-delay: 0.4s; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; }
+  ::-webkit-scrollbar-thumb { background: var(--cardio-teal); border-radius: 4px; }
+  .toast { position: fixed; bottom: 30px; right: 30px; padding: 16px 24px; border-radius: 12px; color: white; font-weight: 600; font-size: 14px; z-index: 1000; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-success { background: var(--cardio-teal); }
+  .toast-error { background: var(--cardio-red); }
+  .logo-img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
+  .africa-map-bg { background: linear-gradient(135deg, rgba(136, 8, 8, 0.03) 0%, rgba(14, 124, 123, 0.03) 100%); }
+  .pillar-card { position: relative; overflow: hidden; }
+  .pillar-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--cardio-red); transform: scaleY(0); transform-origin: top; transition: transform 0.4s ease; }
+  .pillar-card:hover::before { transform: scaleY(1); }
+  .pillar-card.teal::before { background: var(--cardio-teal); }
+  .impact-card { position: relative; overflow: hidden; }
+  .impact-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--cardio-red), var(--cardio-teal)); transform: scaleX(0); transform-origin: left; transition: transform 0.6s ease; }
+  .impact-card:hover::after { transform: scaleX(1); }
+  .contact-info-card { transition: all 0.3s ease; }
+  .contact-info-card:hover { transform: translateX(8px); }
+  .form-group { position: relative; }
+  .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--cardio-dark); }
+  .form-label .required { color: var(--cardio-red); }
+  .error-message { font-size: 12px; color: var(--cardio-red); margin-top: 6px; display: none; }
+  .error-message.show { display: block; }
+  .faq-item { transition: all 0.3s ease; }
+  .faq-item:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+  .hero-image-wrapper { position: relative; }
+  .hero-image-wrapper::before { content: ''; position: absolute; inset: -20px; background: linear-gradient(135deg, rgba(136, 8, 8, 0.2), rgba(14, 124, 123, 0.2)); border-radius: 40px; z-index: -1; filter: blur(40px); }
+</style>
+</head>
+<body>
+
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+      <a href="#" onclick="navigateTo('home')" class="flex items-center gap-3">
+        <img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1504b8167-bbd7-4975-814f-6070a4d2f090.png" alt="CardioP Logo" class="logo-img">
+        <span class="text-xl font-bold" style="color: var(--cardio-dark);">CardioP</span>
+      </a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#" onclick="navigateTo('home')" class="nav-link text-sm font-semibold" style="color: var(--cardio-dark);" data-page="home">Home</a>
+        <a href="#" onclick="navigateTo('about')" class="nav-link text-sm font-semibold" style="color: var(--cardio-dark);" data-page="about">About</a>
+        <a href="#" onclick="navigateTo('contact')" class="nav-link text-sm font-semibold" style="color: var(--cardio-dark);" data-page="contact">Contact</a>
+      </div>
+      <div class="hidden md:flex items-center gap-4">
+        <button onclick="navigateTo('home')" class="text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-300 hover:bg-gray-100" style="color: var(--cardio-dark);">Explore CardioP</button>
+        <button class="btn-primary text-sm !py-2.5 !px-5">Get Started</button>
+      </div>
+      <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+        <svg id="menuIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="closeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="hidden"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div id="mobileMenu" class="mobile-menu fixed inset-0 z-50 md:hidden" style="background: white;">
+  <div class="flex flex-col h-full pt-24 px-6">
+    <a href="#" onclick="navigateTo('home'); toggleMobileMenu();" class="text-2xl font-bold py-4 border-b border-gray-100" style="color: var(--cardio-dark);">Home</a>
+    <a href="#" onclick="navigateTo('about'); toggleMobileMenu();" class="text-2xl font-bold py-4 border-b border-gray-100" style="color: var(--cardio-dark);">About</a>
+    <a href="#" onclick="navigateTo('contact'); toggleMobileMenu();" class="text-2xl font-bold py-4 border-b border-gray-100" style="color: var(--cardio-dark);">Contact</a>
+    <div class="mt-8 flex flex-col gap-4">
+      <button onclick="navigateTo('home'); toggleMobileMenu();" class="btn-primary justify-center">Explore CardioP</button>
+      <button class="btn-secondary justify-center">Get Started</button>
+    </div>
+  </div>
+</div>
+
+<div id="page-home" class="page active">
+  <section class="gradient-hero min-h-screen flex items-center relative overflow-hidden pt-20">
+    <div class="absolute inset-0 opacity-10">
+      <svg class="ecg-line absolute top-1/4 w-[200%] h-20" viewBox="0 0 2000 80" fill="none"><path d="M0,40 L100,40 L120,40 L130,10 L140,70 L150,20 L160,60 L170,40 L200,40 L400,40 L420,40 L430,10 L440,70 L450,20 L460,60 L470,40 L500,40 L700,40 L720,40 L730,10 L740,70 L750,20 L760,60 L770,40 L800,40 L1000,40 L1020,40 L1030,10 L1040,70 L1050,20 L1060,60 L1070,40 L1100,40 L1300,40 L1320,40 L1330,10 L1340,70 L1350,20 L1360,60 L1370,40 L1400,40 L1600,40 L1620,40 L1630,10 L1640,70 L1650,20 L1660,60 L1670,40 L1700,40 L1900,40 L1920,40 L1930,10 L1940,70 L1950,20 L1960,60 L1970,40 L2000,40" stroke="#0E7C7B" stroke-width="2" fill="none"/></svg>
+      <svg class="ecg-line absolute top-2/3 w-[200%] h-20" viewBox="0 0 2000 80" fill="none" style="animation-duration: 4s; animation-direction: reverse;"><path d="M0,40 L100,40 L120,40 L130,10 L140,70 L150,20 L160,60 L170,40 L200,40 L400,40 L420,40 L430,10 L440,70 L450,20 L460,60 L470,40 L500,40 L700,40 L720,40 L730,10 L740,70 L750,20 L760,60 L770,40 L800,40 L1000,40 L1020,40 L1030,10 L1040,70 L1050,20 L1060,60 L1070,40 L1100,40 L1300,40 L1320,40 L1330,10 L1340,70 L1350,20 L1360,60 L1370,40 L1400,40 L1600,40 L1620,40 L1630,10 L1640,70 L1650,20 L1660,60 L1670,40 L1700,40 L1900,40 L1920,40 L1930,10 L1940,70 L1950,20 L1960,60 L1970,40 L2000,40" stroke="#880808" stroke-width="2" fill="none"/></svg>
+    </div>
+    <div class="absolute top-20 left-10 w-2 h-2 rounded-full bg-teal-500 opacity-30 float-anim"></div>
+    <div class="absolute top-40 right-20 w-3 h-3 rounded-full bg-red-500 opacity-20 float-anim" style="animation-delay: 1s;"></div>
+    <div class="absolute bottom-40 left-1/4 w-2 h-2 rounded-full bg-teal-400 opacity-25 float-anim" style="animation-delay: 2s;"></div>
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="fade-in-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(14, 124, 123, 0.15);">
+            <div class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></div>
+            <span class="text-sm font-semibold text-teal-300">Digital Health for Africa</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">Know Your Risk.<br><span class="bg-gradient-to-r from-red-400 to-teal-400 bg-clip-text text-transparent">Protect Your Heart.</span></h1>
+          <p class="text-lg text-gray-300 leading-relaxed mb-8 max-w-lg">AI-powered cardiovascular health tools designed to help you understand your risk, make informed decisions, and take meaningful steps toward a healthier life.</p>
+          <div class="flex flex-wrap gap-4 mb-8">
+            <button onclick="scrollToSection('product')" class="btn-primary">Explore CardioP<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+            <button onclick="scrollToSection('how-it-works')" class="btn-secondary-dark">How CardioP Works</button>
+          </div>
+          <p class="text-sm text-gray-400 flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Built around accessibility, evidence-based health information, and human-centered care.</p>
+        </div>
+        <div class="fade-in-up stagger-2 relative">
+          <div class="relative hero-image-wrapper">
+            <div class="relative z-10"><img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1d08e9f02-3b87-4593-8af8-75d0ac4d3d52.png" alt="CardioP AI Heart Visualization" class="w-full max-w-lg mx-auto rounded-3xl pulse-anim" style="filter: drop-shadow(0 20px 60px rgba(136, 8, 8, 0.3));"></div>
+            <div class="absolute top-10 -left-4 bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 float-anim z-20">
+              <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div><div class="text-xs text-gray-400">Heart Health</div><div class="text-sm font-bold text-white">Good</div></div></div>
+            </div>
+            <div class="absolute bottom-20 -right-4 bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 float-anim z-20" style="animation-delay: 1.5s;">
+              <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div><div class="text-xs text-gray-400">Risk Level</div><div class="text-sm font-bold text-teal-300">Low</div></div></div>
+            </div>
+            <div class="absolute top-1/2 -right-8 bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 float-anim z-20" style="animation-delay: 0.8s;">
+              <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m8.66-13.5l-5.2 3m-5.2 3l-5.2 3m13.4-1.5l-5.2 3m-5.2 3l-5.2 3"/></svg></div><div><div class="text-xs text-gray-400">AI Analysis</div><div class="text-sm font-bold text-purple-300">Active</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator"><div class="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2"><div class="w-1.5 h-3 rounded-full bg-white/60 animate-bounce"></div></div></div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-white bg-pattern">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(136, 8, 8, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-red);">The Challenge</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">Cardiovascular health needs a<br>new approach.</h2>
+        <p class="text-lg text-gray-600 leading-relaxed">Cardiovascular diseases remain a major health challenge across Africa. Many people face barriers to early risk awareness, reliable health information, medication adherence, preventive care, and access to healthcare resources.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card-hover bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-1"><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Early Awareness</h3><p class="text-gray-600 leading-relaxed text-sm">Understand cardiovascular risk before it becomes a crisis. Knowledge is the first step toward prevention.</p></div>
+        <div class="card-hover bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-2"><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(14, 124, 123, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Health Literacy</h3><p class="text-gray-600 leading-relaxed text-sm">Turn complex cardiovascular information into clear, understandable guidance for everyone.</p></div>
+        <div class="card-hover bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-3"><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Medication Support</h3><p class="text-gray-600 leading-relaxed text-sm">Help people stay consistent with their prescribed treatment through smart reminders and guidance.</p></div>
+        <div class="card-hover bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-4"><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(14, 124, 123, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Community Access</h3><p class="text-gray-600 leading-relaxed text-sm">Bring cardiovascular health education and risk awareness closer to underserved communities.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="product" class="py-24 lg:py-32" style="background: linear-gradient(180deg, #FAFAF8 0%, #FFFFFF 100%);">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(14, 124, 123, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-teal);">The Product</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">One platform. A smarter approach<br>to heart health.</h2>
+        <p class="text-lg text-gray-600 leading-relaxed">The CardioP digital product combines AI-powered risk prediction, health education, and personalized support in one accessible platform.</p>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="fade-in-up slide-in-left">
+          <div class="phone-mockup max-w-sm mx-auto">
+            <div class="phone-screen">
+              <div class="flex items-center justify-between px-6 py-3 bg-gray-50"><span class="text-xs font-semibold text-gray-500">9:41</span><div class="flex gap-1"><div class="w-4 h-2 rounded-sm bg-gray-400"></div><div class="w-4 h-2 rounded-sm bg-gray-400"></div><div class="w-6 h-2 rounded-sm bg-gray-400"></div></div></div>
+              <div class="px-5 py-4 bg-gradient-to-r from-red-600 to-red-700"><div class="flex items-center justify-between"><div><p class="text-red-200 text-xs">Good morning</p><h4 class="text-white font-bold text-lg">My Heart Health</h4></div><div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div></div>
+              <div class="px-5 py-4"><div class="bg-gradient-to-r from-red-50 to-teal-50 rounded-2xl p-4 border border-red-100"><div class="flex items-center justify-between mb-3"><span class="text-xs font-semibold text-gray-600">Risk Overview</span><span class="text-xs font-bold text-teal-600 bg-teal-100 px-2 py-1 rounded-full">Low</span></div><div class="flex items-end gap-2 mb-2"><span class="text-3xl font-extrabold" style="color: var(--cardio-red);">12%</span><span class="text-xs text-gray-500 mb-1">10-year risk</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div class="h-2 rounded-full gradient-mixed" style="width: 12%;"></div></div></div></div>
+              <div class="px-5 pb-4 grid grid-cols-3 gap-3">
+                <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center mx-auto mb-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="text-[10px] font-semibold text-gray-600">Ask AI</span></div>
+                <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center mx-auto mb-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="text-[10px] font-semibold text-gray-600">Reminders</span></div>
+                <div class="bg-gray-50 rounded-xl p-3 text-center"><div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mx-auto mb-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><span class="text-[10px] font-semibold text-gray-600">Insights</span></div>
+              </div>
+              <div class="px-5 pb-5"><div class="bg-teal-50 rounded-2xl p-4 border border-teal-100"><div class="flex items-start gap-3"><div class="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center flex-shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><p class="text-xs font-bold text-teal-800 mb-1">Daily Tip</p><p class="text-xs text-teal-700 leading-relaxed">Walking 30 minutes a day can significantly reduce your cardiovascular risk.</p></div></div></div></div>
+            </div>
+          </div>
+          <p class="text-center text-xs text-gray-400 mt-4 italic">Illustrative example — not a clinical diagnosis</p>
+        </div>
+        <div class="fade-in-up slide-in-right">
+          <div class="flex flex-wrap gap-2 mb-8">
+            <button class="tab-btn active" onclick="switchTab('predict', this)">Predict</button>
+            <button class="tab-btn" onclick="switchTab('ask', this)">Ask</button>
+            <button class="tab-btn" onclick="switchTab('protect', this)">Protect</button>
+          </div>
+          <div id="tab-predict" class="tab-content">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <h3 class="text-2xl font-bold mb-4" style="color: var(--cardio-dark);">Understand your cardiovascular risk.</h3>
+            <p class="text-gray-600 leading-relaxed mb-6">CardioP uses an AI-powered personalized risk prediction approach to help users better understand cardiovascular risk factors. By considering your unique health profile, CardioP provides insights that support informed decision-making about your heart health.</p>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Personalized risk factor analysis</span></li>
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Evidence-based health insights</span></li>
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Clear, understandable risk communication</span></li>
+            </ul>
+            <p class="text-xs text-gray-400 mt-6 italic">The risk prediction tool is intended for health awareness and support. It does not replace professional medical diagnosis or treatment.</p>
+          </div>
+          <div id="tab-ask" class="tab-content hidden">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style="background: rgba(14, 124, 123, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <h3 class="text-2xl font-bold mb-4" style="color: var(--cardio-dark);">Get answers you can understand.</h3>
+            <p class="text-gray-600 leading-relaxed mb-6">CardioP AI is a specialized cardiovascular health chatbot designed to provide educational support. Ask questions about heart health, risk factors, medications, and healthy habits — and receive clear, evidence-based responses.</p>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Specialized cardiovascular health knowledge</span></li>
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Available 24/7 for health questions</span></li>
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Educational support, not a replacement for doctors</span></li>
+            </ul>
+          </div>
+          <div id="tab-protect" class="tab-content hidden">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <h3 class="text-2xl font-bold mb-4" style="color: var(--cardio-dark);">Turn knowledge into action.</h3>
+            <p class="text-gray-600 leading-relaxed mb-6">CardioP helps you take meaningful steps toward better heart health with personalized tools and guidance designed to support lasting positive habits.</p>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Smart medication reminders</span></li>
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Healthy habit guidance and tracking</span></li>
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Personalized health education content</span></li>
+              <li class="flex items-start gap-3"><div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="text-sm text-gray-700">Preventive health prompts and check-ins</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(14, 124, 123, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-teal);">AI Chatbot</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">Meet CardioP AI</h2>
+        <p class="text-lg text-gray-600 leading-relaxed">A cardiovascular health companion designed around you. Ask questions, get clear answers, and build confidence in your health decisions.</p>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div class="fade-in-up slide-in-left">
+          <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-md mx-auto">
+            <div class="gradient-mixed p-5 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center relative"><img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1504b8167-bbd7-4975-814f-6070a4d2f090.png" alt="CardioP AI" class="w-8 h-8 rounded-lg"><div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-400 border-2 border-white"></div></div>
+              <div><h4 class="text-white font-bold">CardioP AI</h4><p class="text-white/70 text-xs">Cardiovascular Health Assistant</p></div>
+            </div>
+            <div id="chatMessages" class="p-5 space-y-4 min-h-[300px] max-h-[400px] overflow-y-auto" style="background: #FAFAFA;">
+              <div class="chat-bubble chat-bubble-bot">Hello! I'm CardioP AI, your cardiovascular health companion. I can help you understand heart health, risk factors, and healthy habits. What would you like to know?</div>
+            </div>
+            <div class="px-5 pb-3 flex flex-wrap gap-2" id="quickQuestions">
+              <button onclick="askQuestion('What does high blood pressure mean?')" class="text-xs px-3 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-700 font-medium">What does high blood pressure mean?</button>
+              <button onclick="askQuestion('Why is medication adherence important?')" class="text-xs px-3 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-700 font-medium">Medication adherence</button>
+              <button onclick="askQuestion('What can increase my cardiovascular risk?')" class="text-xs px-3 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-700 font-medium">Risk factors</button>
+              <button onclick="askQuestion('How can I improve my heart health?')" class="text-xs px-3 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-700 font-medium">Improve heart health</button>
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-white">
+              <div class="flex gap-2">
+                <input type="text" id="chatInput" placeholder="Ask about heart health..." class="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-teal-500" onkeypress="if(event.key==='Enter')sendChatMessage()">
+                <button onclick="sendChatMessage()" class="w-12 h-12 rounded-xl gradient-red flex items-center justify-center text-white hover:opacity-90 transition-opacity"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 max-w-md mx-auto">
+            <div class="flex items-start gap-3"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" class="flex-shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p class="text-xs text-amber-800 leading-relaxed"><strong>Safety Note:</strong> CardioP AI provides health information and support. It does not replace a qualified healthcare professional or emergency medical care.</p></div>
+          </div>
+        </div>
+        <div class="fade-in-up slide-in-right space-y-6">
+          <div class="card-hover bg-white rounded-2xl p-6 border border-gray-100"><div class="flex items-start gap-4"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: rgba(136, 8, 8, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><h4 class="font-bold mb-2" style="color: var(--cardio-dark);">Specialized Knowledge</h4><p class="text-sm text-gray-600 leading-relaxed">Trained specifically on cardiovascular health information, providing relevant and accurate responses to your questions.</p></div></div></div>
+          <div class="card-hover bg-white rounded-2xl p-6 border border-gray-100"><div class="flex items-start gap-4"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: rgba(14, 124, 123, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div><div><h4 class="font-bold mb-2" style="color: var(--cardio-dark);">Clear Communication</h4><p class="text-sm text-gray-600 leading-relaxed">Complex health information translated into simple, understandable language that anyone can follow.</p></div></div></div>
+          <div class="card-hover bg-white rounded-2xl p-6 border border-gray-100"><div class="flex items-start gap-4"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: rgba(136, 8, 8, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><h4 class="font-bold mb-2" style="color: var(--cardio-dark);">Always Available</h4><p class="text-sm text-gray-600 leading-relaxed">Get health information and support whenever you need it, day or night, right from your phone.</p></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32" style="background: linear-gradient(135deg, #1A1A1A 0%, #2D0A0A 100%);">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="fade-in-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(255,255,255,0.1);"><span class="text-sm font-semibold text-white/80">Accessibility</span></div>
+          <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">Healthcare should not depend on what you can afford.</h2>
+          <p class="text-lg text-gray-300 leading-relaxed mb-10">CardioP is committed to reaching people regardless of socioeconomic status. We believe everyone deserves access to cardiovascular health information and support.</p>
+          <div class="space-y-6">
+            <div class="flex items-start gap-4"><div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div><h4 class="text-white font-bold mb-1">Smartphone Access</h4><p class="text-gray-400 text-sm leading-relaxed">Digital tools designed for people using smartphones and web-connected devices.</p></div></div>
+            <div class="flex items-start gap-4"><div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><div><h4 class="text-white font-bold mb-1">Low-Tech Accessibility</h4><p class="text-gray-400 text-sm leading-relaxed">Exploring ways to extend health information and support to people without smartphones.</p></div></div>
+            <div class="flex items-start gap-4"><div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><h4 class="text-white font-bold mb-1">Community Outreach</h4><p class="text-gray-400 text-sm leading-relaxed">Patient-centric outreach bringing cardiovascular health awareness directly into underserved communities.</p></div></div>
+          </div>
+        </div>
+        <div class="fade-in-up slide-in-right"><img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/125bef521-6ae6-4adc-b068-81207964e01c.png" alt="Digital health accessibility" class="rounded-3xl w-full" style="box-shadow: 0 40px 80px rgba(0,0,0,0.3);"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(136, 8, 8, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-red);">Community Health</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">Technology meets the community.</h2>
+        <p class="text-lg text-gray-600 leading-relaxed">CardioP combines technology with human-centered community engagement to bring cardiovascular health awareness where it's needed most.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8 mb-16">
+        <div class="fade-in-up stagger-1 relative"><div class="card-hover bg-gradient-to-br from-red-50 to-white rounded-2xl p-8 border border-red-100 h-full"><div class="flex items-center gap-3 mb-6"><div class="w-14 h-14 rounded-2xl gradient-red flex items-center justify-center text-white font-bold text-xl">01</div><div class="hidden md:block flex-1 h-px bg-gradient-to-r from-red-300 to-transparent"></div></div><h3 class="text-2xl font-bold mb-3" style="color: var(--cardio-dark);">Reach</h3><p class="text-gray-600 leading-relaxed">Connect with underserved communities through targeted outreach programs and partnerships.</p></div></div>
+        <div class="fade-in-up stagger-2 relative"><div class="card-hover bg-gradient-to-br from-teal-50 to-white rounded-2xl p-8 border border-teal-100 h-full"><div class="flex items-center gap-3 mb-6"><div class="w-14 h-14 rounded-2xl gradient-teal flex items-center justify-center text-white font-bold text-xl">02</div><div class="hidden md:block flex-1 h-px bg-gradient-to-r from-teal-300 to-transparent"></div></div><h3 class="text-2xl font-bold mb-3" style="color: var(--cardio-dark);">Understand</h3><p class="text-gray-600 leading-relaxed">Support cardiovascular health awareness and early risk identification through education and screening.</p></div></div>
+        <div class="fade-in-up stagger-3"><div class="card-hover bg-gradient-to-br from-red-50 to-white rounded-2xl p-8 border border-red-100 h-full"><div class="flex items-center gap-3 mb-6"><div class="w-14 h-14 rounded-2xl gradient-red flex items-center justify-center text-white font-bold text-xl">03</div></div><h3 class="text-2xl font-bold mb-3" style="color: var(--cardio-dark);">Act</h3><p class="text-gray-600 leading-relaxed">Connect people with appropriate health information, preventive guidance, and healthcare pathways.</p></div></div>
+      </div>
+      <div class="fade-in-up"><img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1d9a91c81-40cd-429b-b492-54345933fae6.png" alt="Community health outreach" class="rounded-3xl w-full h-64 md:h-80 object-cover" style="box-shadow: 0 20px 60px rgba(0,0,0,0.1);"></div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="py-24 lg:py-32 bg-pattern" style="background: #FAFAF8;">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(14, 124, 123, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-teal);">How It Works</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">Your journey to better heart health</h2>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="fade-in-up stagger-1 text-center"><div class="w-20 h-20 rounded-full gradient-red flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl shadow-lg">01</div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Assess</h3><p class="text-gray-600 text-sm leading-relaxed">Learn about your cardiovascular health risk factors through our personalized assessment tools.</p></div>
+        <div class="fade-in-up stagger-2 text-center"><div class="w-20 h-20 rounded-full gradient-teal flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl shadow-lg">02</div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Understand</h3><p class="text-gray-600 text-sm leading-relaxed">Receive personalized, easy-to-understand insights about your cardiovascular health profile.</p></div>
+        <div class="fade-in-up stagger-3 text-center"><div class="w-20 h-20 rounded-full gradient-red flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl shadow-lg">03</div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Ask</h3><p class="text-gray-600 text-sm leading-relaxed">Use CardioP AI to explore cardiovascular health questions and get clear, evidence-based answers.</p></div>
+        <div class="fade-in-up stagger-4 text-center"><div class="w-20 h-20 rounded-full gradient-teal flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl shadow-lg">04</div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Act</h3><p class="text-gray-600 text-sm leading-relaxed">Take informed steps toward prevention and healthier habits with personalized guidance.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(136, 8, 8, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-red);">Our Values</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">Built on four principles.</h2>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card-hover group bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-1 relative overflow-hidden"><div class="absolute inset-0 gradient-red opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Accessibility</h3><p class="text-gray-600 text-sm leading-relaxed">Health tools for everyone, including people without smartphones. We design for inclusion.</p></div>
+        <div class="card-hover group bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-2 relative overflow-hidden"><div class="absolute inset-0 gradient-teal opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(14, 124, 123, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Accuracy</h3><p class="text-gray-600 text-sm leading-relaxed">Evidence-based and medically validated health content you can trust.</p></div>
+        <div class="card-hover group bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-3 relative overflow-hidden"><div class="absolute inset-0 gradient-red opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Empathy</h3><p class="text-gray-600 text-sm leading-relaxed">User-centered design with a human touch. We build with compassion and understanding.</p></div>
+        <div class="card-hover group bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-4 relative overflow-hidden"><div class="absolute inset-0 gradient-teal opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(14, 124, 123, 0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3 class="text-xl font-bold mb-3" style="color: var(--cardio-dark);">Innovation</h3><p class="text-gray-600 text-sm leading-relaxed">Continuous improvement of digital health solutions using the latest technology.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 gradient-hero relative overflow-hidden">
+    <div class="absolute inset-0 flex items-center justify-center"><div class="w-96 h-96 rounded-full bg-red-500/5 ripple"></div><div class="w-96 h-96 rounded-full bg-red-500/5 ripple"></div><div class="w-96 h-96 rounded-full bg-red-500/5 ripple"></div></div>
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10 fade-in-up">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 mb-8 heartbeat"><img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1504b8167-bbd7-4975-814f-6070a4d2f090.png" alt="CardioP" class="w-12 h-12 rounded-lg"></div>
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">Your heart health deserves an<br>earlier conversation.</h2>
+      <p class="text-lg text-gray-300 leading-relaxed mb-10 max-w-2xl mx-auto">CardioP is building accessible digital tools that help people understand cardiovascular risk, learn with confidence, and take action earlier.</p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <button class="btn-primary !bg-white !text-gray-900 hover:!bg-gray-100">Explore CardioP<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <button onclick="navigateTo('contact')" class="btn-secondary-dark">Talk to Us</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="page-about" class="page">
+  <section class="gradient-hero pt-32 pb-24 lg:pb-32 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10"><svg class="ecg-line absolute top-1/3 w-[200%] h-20" viewBox="0 0 2000 80" fill="none"><path d="M0,40 L100,40 L120,40 L130,10 L140,70 L150,20 L160,60 L170,40 L200,40 L400,40 L420,40 L430,10 L440,70 L450,20 L460,60 L470,40 L500,40 L700,40 L720,40 L730,10 L740,70 L750,20 L760,60 L770,40 L800,40 L1000,40 L1020,40 L1030,10 L1040,70 L1050,20 L1060,60 L1070,40 L1100,40 L1300,40 L1320,40 L1330,10 L1340,70 L1350,20 L1360,60 L1370,40 L1400,40 L1600,40 L1620,40 L1630,10 L1640,70 L1650,20 L1660,60 L1670,40 L1700,40 L1900,40 L1920,40 L1930,10 L1940,70 L1950,20 L1960,60 L1970,40 L2000,40" stroke="#0E7C7B" stroke-width="2" fill="none"/></svg></div>
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+      <div class="max-w-4xl mx-auto text-center fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(14, 124, 123, 0.15);"><span class="text-sm font-semibold text-teal-300">About CardioP</span></div>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">Building a healthier future,<br><span class="bg-gradient-to-r from-red-400 to-teal-400 bg-clip-text text-transparent">one heartbeat at a time.</span></h1>
+        <p class="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">CardioP is an African digital health initiative focused on making cardiovascular health information, risk awareness, and preventive support more accessible to everyone.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="fade-in-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(136, 8, 8, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-red);">Our Story</span></div>
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-6" style="color: var(--cardio-dark);">Why CardioP exists.</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">Cardiovascular diseases are a growing health challenge across Africa, yet many people lack access to the information, tools, and support needed to understand and manage their heart health.</p>
+          <p class="text-gray-600 leading-relaxed mb-4">CardioP was created to bridge this gap. We combine artificial intelligence, preventive healthcare, and community-centered outreach to deliver cardiovascular health solutions that are accessible, understandable, and actionable.</p>
+          <p class="text-gray-600 leading-relaxed">Starting in Nigeria, we are building a platform that puts people first — meeting them where they are, speaking in ways they understand, and supporting them every step of the way toward better heart health.</p>
+        </div>
+        <div class="fade-in-up slide-in-right">
+          <div class="relative">
+            <img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1976f0428-adff-4add-86a6-aedf8f198347.png" alt="Africa connected health network" class="rounded-3xl w-full" style="box-shadow: 0 20px 60px rgba(0,0,0,0.1);">
+            <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl max-w-xs">
+              <div class="flex items-center gap-3 mb-2"><div class="w-10 h-10 rounded-xl gradient-red flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><span class="font-bold" style="color: var(--cardio-dark);">Africa-First</span></div>
+              <p class="text-sm text-gray-600">Built for African communities, by people who understand the challenges.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 africa-map-bg">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16">
+        <div class="fade-in-up">
+          <div class="h-full bg-gradient-to-br from-red-50 to-white rounded-3xl p-10 border border-red-100 relative overflow-hidden group hover:shadow-2xl transition-all duration-500">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-red-100 rounded-full -mr-20 -mt-20 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="relative z-10">
+              <div class="w-14 h-14 rounded-2xl gradient-red flex items-center justify-center mb-6"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+              <h3 class="text-sm font-bold uppercase tracking-wider mb-4" style="color: var(--cardio-red);">Our Vision</h3>
+              <p class="text-xl font-semibold leading-relaxed" style="color: var(--cardio-dark);">To become the most trusted digital health companion for cardiovascular wellness across Africa, starting with Nigeria, empowering individuals regardless of socioeconomic status, with the knowledge and tools needed to live longer, healthier lives.</p>
+            </div>
+          </div>
+        </div>
+        <div class="fade-in-up stagger-2">
+          <div class="h-full bg-gradient-to-br from-teal-50 to-white rounded-3xl p-10 border border-teal-100 relative overflow-hidden group hover:shadow-2xl transition-all duration-500">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-teal-100 rounded-full -mr-20 -mt-20 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="relative z-10">
+              <div class="w-14 h-14 rounded-2xl gradient-teal flex items-center justify-center mb-6"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+              <h3 class="text-sm font-bold uppercase tracking-wider mb-4" style="color: var(--cardio-teal);">Our Mission</h3>
+              <p class="text-xl font-semibold leading-relaxed" style="color: var(--cardio-dark);">To reduce preventable cardiovascular deaths by providing accessible, evidence-based tools that support early risk identification, medication adherence, and improved health literacy for adults in underserved communities.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(136, 8, 8, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-red);">Our Approach</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">Three pillars of impact.</h2>
+        <p class="text-lg text-gray-600 leading-relaxed">CardioP sits at the intersection of technology, people, and community — creating solutions that are innovative, human-centered, and accessible.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="pillar-card card-hover bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-1">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <h3 class="text-2xl font-bold mb-4" style="color: var(--cardio-dark);">Technology</h3>
+          <p class="text-gray-600 leading-relaxed">AI-powered tools that make cardiovascular health information more accessible, personalized, and actionable for everyone.</p>
+          <div class="mt-6 pt-6 border-t border-gray-100">
+            <ul class="space-y-2"><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>AI risk prediction</li><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Smart health insights</li><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Personalized recommendations</li></ul>
+          </div>
+        </div>
+        <div class="pillar-card teal card-hover bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-2">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(14, 124, 123, 0.08);"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <h3 class="text-2xl font-bold mb-4" style="color: var(--cardio-dark);">People</h3>
+          <p class="text-gray-600 leading-relaxed">Human-centered experiences designed around real patient needs, built with empathy and cultural understanding.</p>
+          <div class="mt-6 pt-6 border-t border-gray-100">
+            <ul class="space-y-2"><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>User-centered design</li><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Clear, simple language</li><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Culturally relevant content</li></ul>
+          </div>
+        </div>
+        <div class="pillar-card card-hover bg-white rounded-2xl p-8 border border-gray-100 fade-in-up stagger-3">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style="background: rgba(136, 8, 8, 0.08);"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <h3 class="text-2xl font-bold mb-4" style="color: var(--cardio-dark);">Community</h3>
+          <p class="text-gray-600 leading-relaxed">Outreach that brings cardiovascular health awareness closer to underserved populations across Nigeria and beyond.</p>
+          <div class="mt-6 pt-6 border-t border-gray-100">
+            <ul class="space-y-2"><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Community health outreach</li><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Health education programs</li><li class="flex items-center gap-2 text-sm text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Local partnerships</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-pattern" style="background: #FAFAF8;">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(14, 124, 123, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-teal);">Impact</span></div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6" style="color: var(--cardio-dark);">Designed for impact beyond the screen.</h2>
+        <p class="text-lg text-gray-600 leading-relaxed">CardioP is built to create meaningful change in cardiovascular health outcomes across communities.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="impact-card card-hover bg-gradient-to-br from-red-50 to-white rounded-2xl p-8 border border-red-100 fade-in-up stagger-1"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="text-xs font-bold text-red-600 uppercase tracking-wider">Focus Area</span></div><h4 class="text-lg font-bold mb-2" style="color: var(--cardio-dark);">Earlier Risk Awareness</h4><p class="text-sm text-gray-600">Helping people understand their cardiovascular risk before it becomes a crisis.</p></div>
+        <div class="impact-card card-hover bg-gradient-to-br from-teal-50 to-white rounded-2xl p-8 border border-teal-100 fade-in-up stagger-2"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><span class="text-xs font-bold text-teal-600 uppercase tracking-wider">Focus Area</span></div><h4 class="text-lg font-bold mb-2" style="color: var(--cardio-dark);">Better Health Literacy</h4><p class="text-sm text-gray-600">Making cardiovascular health information clear and understandable for everyone.</p></div>
+        <div class="impact-card card-hover bg-gradient-to-br from-red-50 to-white rounded-2xl p-8 border border-red-100 fade-in-up stagger-3"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="text-xs font-bold text-red-600 uppercase tracking-wider">Focus Area</span></div><h4 class="text-lg font-bold mb-2" style="color: var(--cardio-dark);">Improved Medication Adherence</h4><p class="text-sm text-gray-600">Supporting people to stay consistent with their prescribed treatment plans.</p></div>
+        <div class="impact-card card-hover bg-gradient-to-br from-teal-50 to-white rounded-2xl p-8 border border-teal-100 fade-in-up stagger-1"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><span class="text-xs font-bold text-teal-600 uppercase tracking-wider">Focus Area</span></div><h4 class="text-lg font-bold mb-2" style="color: var(--cardio-dark);">Preventive Health Engagement</h4><p class="text-sm text-gray-600">Encouraging proactive health behaviors and regular health check-ins.</p></div>
+        <div class="impact-card card-hover bg-gradient-to-br from-red-50 to-white rounded-2xl p-8 border border-red-100 fade-in-up stagger-2"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><span class="text-xs font-bold text-red-600 uppercase tracking-wider">Focus Area</span></div><h4 class="text-lg font-bold mb-2" style="color: var(--cardio-dark);">Greater Access to Information</h4><p class="text-sm text-gray-600">Extending health information reach to underserved and remote communities.</p></div>
+        <div class="impact-card card-hover bg-gradient-to-br from-teal-50 to-white rounded-2xl p-8 border border-teal-100 fade-in-up stagger-3"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="text-xs font-bold text-teal-600 uppercase tracking-wider">Focus Area</span></div><h4 class="text-lg font-bold mb-2" style="color: var(--cardio-dark);">Stronger Community Outreach</h4><p class="text-sm text-gray-600">Building sustainable health education programs within communities.</p></div>
+      </div>
+      <div class="mt-12 p-6 rounded-2xl bg-amber-50 border border-amber-200 max-w-2xl mx-auto text-center fade-in-up"><p class="text-sm text-amber-800"><strong>Impact metrics coming soon.</strong> As CardioP grows, we will share measurable outcomes and community impact data transparently.</p></div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 gradient-mixed relative overflow-hidden">
+    <div class="absolute inset-0 flex items-center justify-center"><div class="w-96 h-96 rounded-full bg-white/5 ripple"></div><div class="w-96 h-96 rounded-full bg-white/5 ripple"></div></div>
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10 fade-in-up">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 mb-8 heartbeat"><img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1504b8167-bbd7-4975-814f-6070a4d2f090.png" alt="CardioP" class="w-12 h-12 rounded-lg"></div>
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6">Join us in building the future of cardiovascular wellness.</h2>
+      <p class="text-lg text-white/80 mb-10 max-w-2xl mx-auto">Whether you're a healthcare professional, researcher, community leader, or someone who cares about heart health — there's a place for you in the CardioP story.</p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <button onclick="navigateTo('contact')" class="btn-primary !bg-white !text-gray-900 hover:!bg-gray-100">Get in Touch<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <button onclick="navigateTo('home')" class="btn-secondary-dark">Explore the Product</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="page-contact" class="page">
+  <section class="gradient-hero pt-32 pb-24 lg:pb-32 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10"><svg class="ecg-line absolute top-1/3 w-[200%] h-20" viewBox="0 0 2000 80" fill="none"><path d="M0,40 L100,40 L120,40 L130,10 L140,70 L150,20 L160,60 L170,40 L200,40 L400,40 L420,40 L430,10 L440,70 L450,20 L460,60 L470,40 L500,40 L700,40 L720,40 L730,10 L740,70 L750,20 L760,60 L770,40 L800,40 L1000,40 L1020,40 L1030,10 L1040,70 L1050,20 L1060,60 L1070,40 L1100,40 L1300,40 L1320,40 L1330,10 L1340,70 L1350,20 L1360,60 L1370,40 L1400,40 L1600,40 L1620,40 L1630,10 L1640,70 L1650,20 L1660,60 L1670,40 L1700,40 L1900,40 L1920,40 L1930,10 L1940,70 L1950,20 L1960,60 L1970,40 L2000,40" stroke="#0E7C7B" stroke-width="2" fill="none"/></svg></div>
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+      <div class="max-w-3xl mx-auto text-center fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(14, 124, 123, 0.15);"><span class="text-sm font-semibold text-teal-300">Contact Us</span></div>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">Let's build a healthier<br><span class="bg-gradient-to-r from-red-400 to-teal-400 bg-clip-text text-transparent">future together.</span></h1>
+        <p class="text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">Whether you're interested in CardioP, partnerships, community health outreach, research, or collaboration, we'd love to hear from you.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid lg:grid-cols-5 gap-12 lg:gap-16">
+        <div class="lg:col-span-2 fade-in-up">
+          <h3 class="text-2xl font-bold mb-6" style="color: var(--cardio-dark);">We'd love to connect.</h3>
+          <p class="text-gray-600 leading-relaxed mb-8">Fill out the form and our team will get back to you as soon as possible. We respond to all enquiries within 48 hours.</p>
+          <div class="space-y-4">
+            <div class="contact-info-card flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: rgba(136, 8, 8, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><h4 class="font-bold mb-1" style="color: var(--cardio-dark);">Email</h4><p class="text-sm text-gray-600">hello@cardiop.health</p></div></div>
+            <div class="contact-info-card flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: rgba(14, 124, 123, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><h4 class="font-bold mb-1" style="color: var(--cardio-dark);">Location</h4><p class="text-sm text-gray-600">Nigeria</p></div></div>
+            <div class="contact-info-card flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: rgba(136, 8, 8, 0.08);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#880808" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><h4 class="font-bold mb-1" style="color: var(--cardio-dark);">Response Time</h4><p class="text-sm text-gray-600">Within 48 hours</p></div></div>
+          </div>
+          <div class="mt-10 p-6 rounded-2xl bg-gradient-to-br from-red-50 to-teal-50 border border-gray-100"><div class="flex items-start gap-3 mb-3"><div class="w-10 h-10 rounded-xl gradient-mixed flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h4 class="font-bold" style="color: var(--cardio-dark);">For Partnerships</h4></div><p class="text-sm text-gray-600 leading-relaxed">Interested in partnering with CardioP for community health outreach, research collaboration, or technology integration? We're open to meaningful conversations that advance cardiovascular health in Africa.</p></div>
+          <div class="mt-6 p-6 rounded-2xl bg-gray-50 border border-gray-100"><div class="flex items-start gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h4 class="font-bold" style="color: var(--cardio-dark);">For Researchers</h4></div><p class="text-sm text-gray-600 leading-relaxed">We welcome research collaborations focused on cardiovascular health, digital health innovation, and community health outcomes in African populations.</p></div>
+        </div>
+        <div class="lg:col-span-3 fade-in-up stagger-2">
+          <form id="contactForm" class="bg-white rounded-3xl p-8 md:p-10 border border-gray-100 shadow-xl" onsubmit="handleFormSubmit(event)">
+            <div class="mb-8"><h3 class="text-2xl font-bold mb-2" style="color: var(--cardio-dark);">Send us a message</h3><p class="text-sm text-gray-600">All fields marked with <span class="text-red-500">*</span> are required.</p></div>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+              <div class="form-group"><label class="form-label">Full Name <span class="required">*</span></label><input type="text" id="fullName" class="form-input" placeholder="Your full name" required><p class="error-message" id="fullNameError">Please enter your full name</p></div>
+              <div class="form-group"><label class="form-label">Email Address <span class="required">*</span></label><input type="email" id="email" class="form-input" placeholder="your@email.com" required><p class="error-message" id="emailError">Please enter a valid email address</p></div>
+            </div>
+            <div class="mb-6 form-group"><label class="form-label">Organization</label><input type="text" id="organization" class="form-input" placeholder="Your organization (optional)"></div>
+            <div class="mb-6 form-group"><label class="form-label">Subject <span class="required">*</span></label><select id="subject" class="form-input" required><option value="">Select a subject</option><option value="general">General enquiry</option><option value="partnership">Partnership</option><option value="outreach">Community outreach</option><option value="research">Research</option><option value="media">Media</option><option value="other">Other</option></select><p class="error-message" id="subjectError">Please select a subject</p></div>
+            <div class="mb-8 form-group"><label class="form-label">Message <span class="required">*</span></label><textarea id="message" class="form-input" rows="5" placeholder="Tell us how we can help..." required></textarea><p class="error-message" id="messageError">Please enter your message</p></div>
+            <button type="submit" class="btn-primary w-full justify-center !py-4">Send Message<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            <p class="text-xs text-gray-400 text-center mt-4">By submitting this form, you agree to our privacy policy. We will never share your information.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 lg:py-32 bg-pattern" style="background: #FAFAF8;">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-16 fade-in-up">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background: rgba(136, 8, 8, 0.08);"><span class="text-sm font-semibold" style="color: var(--cardio-red);">FAQ</span></div>
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-6" style="color: var(--cardio-dark);">Frequently asked questions</h2>
+      </div>
+      <div class="space-y-4 fade-in-up">
+        <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden"><button class="faq-toggle w-full text-left p-6 flex items-center justify-between" onclick="toggleFaq(this)"><span class="font-semibold" style="color: var(--cardio-dark);">What is CardioP?</span><svg class="faq-icon w-5 h-5 transition-transform" style="color: var(--cardio-red);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-content hidden px-6 pb-6"><p class="text-gray-600 leading-relaxed">CardioP is a digital health platform focused on reducing preventable cardiovascular disease and improving cardiovascular wellness across Africa, starting with Nigeria. We offer AI-powered risk prediction, a specialized health chatbot, and community health outreach services.</p></div></div>
+        <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden"><button class="faq-toggle w-full text-left p-6 flex items-center justify-between" onclick="toggleFaq(this)"><span class="font-semibold" style="color: var(--cardio-dark);">Is CardioP a replacement for a doctor?</span><svg class="faq-icon w-5 h-5 transition-transform" style="color: var(--cardio-red);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-content hidden px-6 pb-6"><p class="text-gray-600 leading-relaxed">No. CardioP is designed to support health education, awareness, and preventive care. It is not a substitute for professional medical diagnosis, treatment, or emergency medical care. Always consult a qualified healthcare professional for medical advice.</p></div></div>
+        <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden"><button class="faq-toggle w-full text-left p-6 flex items-center justify-between" onclick="toggleFaq(this)"><span class="font-semibold" style="color: var(--cardio-dark);">How can I partner with CardioP?</span><svg class="faq-icon w-5 h-5 transition-transform" style="color: var(--cardio-red);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-content hidden px-6 pb-6"><p class="text-gray-600 leading-relaxed">We welcome partnerships with healthcare organizations, community groups, researchers, and technology providers. Use the contact form above and select "Partnership" as your subject to get in touch with our team.</p></div></div>
+        <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden"><button class="faq-toggle w-full text-left p-6 flex items-center justify-between" onclick="toggleFaq(this)"><span class="font-semibold" style="color: var(--cardio-dark);">Is CardioP available outside Nigeria?</span><svg class="faq-icon w-5 h-5 transition-transform" style="color: var(--cardio-red);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-content hidden px-6 pb-6"><p class="text-gray-600 leading-relaxed">CardioP is currently focused on Nigeria, with plans to expand across Africa. Our vision is to become the most trusted digital health companion for cardiovascular wellness across the continent.</p></div></div>
+        <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden"><button class="faq-toggle w-full text-left p-6 flex items-center justify-between" onclick="toggleFaq(this)"><span class="font-semibold" style="color: var(--cardio-dark);">How does CardioP protect user data?</span><svg class="faq-icon w-5 h-5 transition-transform" style="color: var(--cardio-red);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-content hidden px-6 pb-6"><p class="text-gray-600 leading-relaxed">We take data privacy and security seriously. All user information is handled in accordance with applicable data protection regulations. We never share personal information with third parties without explicit consent.</p></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="bg-gray-900 text-white pt-20 pb-8">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+      <div class="lg:col-span-2">
+        <div class="flex items-center gap-3 mb-4"><img src="https://image.qwenlm.ai/public_source/5d3565c4-efb5-458d-b6f2-916053e67269/1504b8167-bbd7-4975-814f-6070a4d2f090.png" alt="CardioP Logo" class="logo-img"><span class="text-xl font-bold">CardioP</span></div>
+        <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">Predict. Prevent. Protect.<br>Building accessible digital tools for cardiovascular wellness across Africa.</p>
+        <div class="flex gap-3">
+          <a href="#" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
+          <a href="#" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+          <a href="#" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        </div>
+      </div>
+      <div><h4 class="font-bold mb-4 text-sm uppercase tracking-wider">Navigation</h4><ul class="space-y-3"><li><a href="#" onclick="navigateTo('home')" class="text-gray-400 hover:text-white transition-colors text-sm">Home</a></li><li><a href="#" onclick="navigateTo('about')" class="text-gray-400 hover:text-white transition-colors text-sm">About</a></li><li><a href="#" onclick="navigateTo('contact')" class="text-gray-400 hover:text-white transition-colors text-sm">Contact</a></li></ul></div>
+      <div><h4 class="font-bold mb-4 text-sm uppercase tracking-wider">Product</h4><ul class="space-y-3"><li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Risk Prediction</a></li><li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">CardioP AI</a></li><li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Medication Support</a></li></ul></div>
+      <div><h4 class="font-bold mb-4 text-sm uppercase tracking-wider">Services</h4><ul class="space-y-3"><li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Community Outreach</a></li><li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Health Education</a></li><li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Partnerships</a></li></ul></div>
+    </div>
+    <div class="border-t border-gray-800 pt-8">
+      <div class="p-4 rounded-xl bg-gray-800/50 mb-8"><p class="text-xs text-gray-400 leading-relaxed"><strong class="text-gray-300">Health Disclaimer:</strong> CardioP's digital tools are designed to support health education, awareness, and preventive care. They are not a substitute for professional medical diagnosis, treatment, or emergency medical care. Always consult a qualified healthcare professional for medical advice.</p></div>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4"><p class="text-sm text-gray-500">© 2026 CardioP. All rights reserved.</p><div class="flex gap-6"><a href="#" class="text-sm text-gray-500 hover:text-white transition-colors">Privacy Policy</a><a href="#" class="text-sm text-gray-500 hover:text-white transition-colors">Terms of Service</a></div></div>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" class="toast"></div>
+
+<script>
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(link => { link.classList.remove('active'); if (link.dataset.page === page) link.classList.add('active'); });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => { observeAnimations(); }, 100);
+}
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const menuIcon = document.getElementById('menuIcon');
+  const closeIcon = document.getElementById('closeIcon');
+  menu.classList.toggle('open');
+  menuIcon.classList.toggle('hidden');
+  closeIcon.classList.toggle('hidden');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+function scrollToSection(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function switchTab(tabName, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+  document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+}
+const chatResponses = {
+  'What does high blood pressure mean?': 'High blood pressure (hypertension) means the force of blood against your artery walls is consistently too high. Over time, this can damage your heart and blood vessels, increasing your risk of heart disease and stroke. Regular monitoring and lifestyle changes can help manage it effectively.',
+  'Why is medication adherence important?': 'Medication adherence — taking your prescribed medications as directed — is crucial for managing cardiovascular conditions. Missing doses can lead to uncontrolled blood pressure and increased risk of complications. Consistent medication use helps maintain stable health outcomes.',
+  'What can increase my cardiovascular risk?': 'Several factors can increase cardiovascular risk, including: high blood pressure, high cholesterol, diabetes, smoking, obesity, physical inactivity, unhealthy diet, excessive alcohol consumption, family history of heart disease, and chronic stress.',
+  'How can I improve my heart health?': 'You can improve your heart health through: maintaining a balanced diet rich in fruits, vegetables, and whole grains; engaging in regular physical activity (at least 150 minutes of moderate exercise per week); managing stress; avoiding smoking; maintaining a healthy weight; and getting regular health check-ups.'
+};
+function askQuestion(question) {
+  addChatBubble(question, 'user');
+  showTypingIndicator();
+  setTimeout(() => {
+    removeTypingIndicator();
+    const response = chatResponses[question] || 'Thank you for your question. CardioP AI provides educational health information. For personalized medical advice, please consult a qualified healthcare professional.';
+    addChatBubble(response, 'bot');
+  }, 1500);
+}
+function sendChatMessage() { const input = document.getElementById('chatInput'); const msg = input.value.trim(); if (msg) { askQuestion(msg); input.value = ''; } }
+function addChatBubble(text, type) { const chatMessages = document.getElementById('chatMessages'); const bubble = document.createElement('div'); bubble.className = `chat-bubble chat-bubble-${type}`; bubble.textContent = text; chatMessages.appendChild(bubble); chatMessages.scrollTop = chatMessages.scrollHeight; }
+function showTypingIndicator() { const chatMessages = document.getElementById('chatMessages'); const indicator = document.createElement('div'); indicator.id = 'typingIndicator'; indicator.className = 'chat-bubble chat-bubble-bot flex gap-1 items-center'; indicator.innerHTML = '<div class="typing-dot w-2 h-2 rounded-full bg-gray-400"></div><div class="typing-dot w-2 h-2 rounded-full bg-gray-400"></div><div class="typing-dot w-2 h-2 rounded-full bg-gray-400"></div>'; chatMessages.appendChild(indicator); chatMessages.scrollTop = chatMessages.scrollHeight; }
+function removeTypingIndicator() { const indicator = document.getElementById('typingIndicator'); if (indicator) indicator.remove(); }
+function handleFormSubmit(event) {
+  event.preventDefault();
+  document.querySelectorAll('.form-input').forEach(input => input.classList.remove('error'));
+  document.querySelectorAll('.error-message').forEach(error => error.classList.remove('show'));
+  let isValid = true;
+  const fullName = document.getElementById('fullName');
+  if (!fullName.value.trim()) { fullName.classList.add('error'); document.getElementById('fullNameError').classList.add('show'); isValid = false; }
+  const email = document.getElementById('email');
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.value.trim() || !emailRegex.test(email.value)) { email.classList.add('error'); document.getElementById('emailError').classList.add('show'); isValid = false; }
+  const subject = document.getElementById('subject');
+  if (!subject.value) { subject.classList.add('error'); document.getElementById('subjectError').classList.add('show'); isValid = false; }
+  const message = document.getElementById('message');
+  if (!message.value.trim()) { message.classList.add('error'); document.getElementById('messageError').classList.add('show'); isValid = false; }
+  if (isValid) { showToast('Message sent successfully! We\'ll get back to you soon.', 'success'); document.getElementById('contactForm').reset(); } else { showToast('Please fill in all required fields.', 'error'); }
+}
+function showToast(message, type) { const toast = document.getElementById('toast'); toast.textContent = message; toast.className = `toast toast-${type} show`; setTimeout(() => { toast.classList.remove('show'); }, 4000); }
+function toggleFaq(button) {
+  const faqItem = button.parentElement;
+  const content = faqItem.querySelector('.faq-content');
+  const icon = button.querySelector('.faq-icon');
+  const isOpen = !content.classList.contains('hidden');
+  document.querySelectorAll('.faq-item').forEach(item => { item.querySelector('.faq-content').classList.add('hidden'); item.querySelector('.faq-icon').style.transform = 'rotate(0deg)'; });
+  if (!isOpen) { content.classList.remove('hidden'); icon.style.transform = 'rotate(180deg)'; }
+}
+function observeAnimations() {
+  const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); }); }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.fade-in-up, .slide-in-left, .slide-in-right').forEach(el => { observer.observe(el); });
+}
+window.addEventListener('scroll', () => { const navbar = document.getElementById('navbar'); if (window.pageYOffset > 100) navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'; else navbar.style.boxShadow = 'none'; });
+document.addEventListener('DOMContentLoaded', () => { observeAnimations(); document.querySelector('[data-page="home"]').classList.add('active'); });
+</script>
+
+</body>
+</html>
