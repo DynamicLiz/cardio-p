@@ -1,0 +1,806 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+
+                /* ============================================
+   CardioP — styles.css
+   Predict. Prevent. Protect.
+   ============================================ */
+
+/* ============================================
+   1. CSS CUSTOM PROPERTIES (VARIABLES)
+   ============================================ */
+:root {
+  /* Brand Colors */
+  --cardio-red: #880808;
+  --cardio-red-light: #A01010;
+  --cardio-teal: #0E7C7B;
+  --cardio-teal-light: #12A09F;
+  --cardio-dark: #1A1A1A;
+  --cardio-light: #FAFAF8;
+  --cardio-gray: #6B6B6B;
+
+  /* Gradients */
+  --gradient-hero: linear-gradient(135deg, #1A1A1A 0%, #2D0A0A 50%, #0A2D2D 100%);
+  --gradient-red: linear-gradient(135deg, #880808 0%, #A01010 100%);
+  --gradient-teal: linear-gradient(135deg, #0E7C7B 0%, #12A09F 100%);
+  --gradient-mixed: linear-gradient(135deg, #880808 0%, #0E7C7B 100%);
+  --gradient-text: linear-gradient(to right, #f87171, #2dd4bf);
+
+  /* Spacing */
+  --section-padding: 6rem 1.5rem;
+  --section-padding-lg: 8rem 2rem;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 36px;
+
+  /* Shadows */
+  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 20px 60px rgba(136, 8, 8, 0.12);
+  --shadow-lg: 0 40px 80px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 40px 80px rgba(0, 0, 0, 0.3);
+
+  /* Transitions */
+  --transition-fast: 0.3s ease;
+  --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Typography */
+  --font-primary: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ============================================
+   2. RESET & BASE STYLES
+   ============================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-primary);
+  color: var(--cardio-dark);
+  background: #FFFFFF;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul {
+  list-style: none;
+}
+
+/* ============================================
+   3. KEYFRAME ANIMATIONS
+   ============================================ */
+@keyframes ecgPulse {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  56% { transform: scale(1); }
+}
+
+@keyframes typing {
+  0%, 60%, 100% { opacity: 0.3; }
+  30% { opacity: 1; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes drawLine {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ============================================
+   4. ANIMATION CLASSES
+   ============================================ */
+.ecg-line {
+  animation: ecgPulse 3s linear infinite;
+}
+
+.pulse-anim {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.float-anim {
+  animation: float 4s ease-in-out infinite;
+}
+
+.heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.ripple {
+  animation: ripple 2s ease-out infinite;
+}
+
+.ripple:nth-child(2) { animation-delay: 0.5s; }
+.ripple:nth-child(3) { animation-delay: 1s; }
+
+.typing-dot {
+  animation: typing 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.ecg-draw {
+  stroke-dasharray: 1000;
+  animation: drawLine 3s ease-in-out infinite;
+}
+
+/* ============================================
+   5. SCROLL-TRIGGERED ANIMATIONS
+   ============================================ */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all var(--transition-slow);
+}
+
+.fade-in-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.slide-in-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: all var(--transition-slow);
+}
+
+.slide-in-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.slide-in-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: all var(--transition-slow);
+}
+
+.slide-in-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Stagger Delays */
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.3s; }
+.stagger-4 { transition-delay: 0.4s; }
+
+/* ============================================
+   6. PAGE TRANSITIONS (SPA MODE)
+   ============================================ */
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+  animation: fadeInUp 0.5s ease;
+}
+
+/* ============================================
+   7. NAVIGATION
+   ============================================ */
+.nav-link {
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--cardio-red);
+  transition: width var(--transition-fast);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* ============================================
+   8. BUTTONS
+   ============================================ */
+.btn-primary {
+  background: var(--cardio-red);
+  color: white;
+  padding: 14px 32px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 15px;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--cardio-red-light);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(136, 8, 8, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--cardio-dark);
+  padding: 14px 32px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 15px;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid #E5E5E5;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  border-color: var(--cardio-teal);
+  color: var(--cardio-teal);
+  transform: translateY(-2px);
+}
+
+.btn-secondary-dark {
+  background: transparent;
+  color: white;
+  padding: 14px 32px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 15px;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.btn-secondary-dark:hover {
+  border-color: white;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   9. TABS
+   ============================================ */
+.tab-btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--cardio-gray);
+}
+
+.tab-btn.active {
+  background: var(--cardio-red);
+  color: white;
+}
+
+.tab-btn:hover:not(.active) {
+  background: #F5F5F5;
+  color: var(--cardio-dark);
+}
+
+/* ============================================
+   10. CHATBOT
+   ============================================ */
+.chat-bubble {
+  max-width: 80%;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  animation: fadeInUp 0.4s ease;
+}
+
+.chat-bubble-user {
+  background: var(--cardio-red);
+  color: white;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+
+.chat-bubble-bot {
+  background: #F3F4F6;
+  color: var(--cardio-dark);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+
+/* ============================================
+   11. PHONE MOCKUP
+   ============================================ */
+.phone-mockup {
+  background: var(--cardio-dark);
+  border-radius: var(--radius-2xl);
+  padding: 12px;
+  box-shadow: var(--shadow-lg);
+}
+
+.phone-screen {
+  background: white;
+  border-radius: 26px;
+  overflow: hidden;
+}
+
+/* ============================================
+   12. FORM ELEMENTS
+   ============================================ */
+.form-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #E5E5E5;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-family: var(--font-primary);
+  transition: all var(--transition-fast);
+  background: white;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--cardio-teal);
+  box-shadow: 0 0 0 4px rgba(14, 124, 123, 0.1);
+}
+
+.form-input.error {
+  border-color: var(--cardio-red);
+  box-shadow: 0 0 0 4px rgba(136, 8, 8, 0.1);
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--cardio-dark);
+}
+
+.form-label .required {
+  color: var(--cardio-red);
+}
+
+.error-message {
+  font-size: 12px;
+  color: var(--cardio-red);
+  margin-top: 6px;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
+/* ============================================
+   13. MOBILE MENU
+   ============================================ */
+.mobile-menu {
+  transform: translateX(100%);
+  transition: transform var(--transition-smooth);
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+/* ============================================
+   14. TOAST NOTIFICATIONS
+   ============================================ */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-success {
+  background: var(--cardio-teal);
+}
+
+.toast-error {
+  background: var(--cardio-red);
+}
+
+/* ============================================
+   15. LOGO
+   ============================================ */
+.logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ============================================
+   16. BACKGROUND PATTERNS & GRADIENTS
+   ============================================ */
+.bg-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(14, 124, 123, 0.05) 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+.africa-map-bg {
+  background: linear-gradient(135deg, rgba(136, 8, 8, 0.03) 0%, rgba(14, 124, 123, 0.03) 100%);
+}
+
+.gradient-hero {
+  background: var(--gradient-hero);
+}
+
+.gradient-red {
+  background: var(--gradient-red);
+}
+
+.gradient-teal {
+  background: var(--gradient-teal);
+}
+
+.gradient-mixed {
+  background: var(--gradient-mixed);
+}
+
+/* ============================================
+   17. CARDS
+   ============================================ */
+.card-hover {
+  transition: all var(--transition-smooth);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Pillar Cards (About Page) */
+.pillar-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.pillar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--cardio-red);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.4s ease;
+}
+
+.pillar-card:hover::before {
+  transform: scaleY(1);
+}
+
+.pillar-card.teal::before {
+  background: var(--cardio-teal);
+}
+
+/* Impact Cards (About Page) */
+.impact-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.impact-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cardio-red), var(--cardio-teal));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s ease;
+}
+
+.impact-card:hover::after {
+  transform: scaleX(1);
+}
+
+/* Contact Info Cards */
+.contact-info-card {
+  transition: all var(--transition-fast);
+}
+
+.contact-info-card:hover {
+  transform: translateX(8px);
+}
+
+/* FAQ Items */
+.faq-item {
+  transition: all var(--transition-fast);
+}
+
+.faq-item:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   18. HERO IMAGE WRAPPER
+   ============================================ */
+.hero-image-wrapper {
+  position: relative;
+}
+
+.hero-image-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: linear-gradient(135deg, rgba(136, 8, 8, 0.2), rgba(14, 124, 123, 0.2));
+  border-radius: 40px;
+  z-index: -1;
+  filter: blur(40px);
+}
+
+/* ============================================
+   19. SCROLL INDICATOR
+   ============================================ */
+.scroll-indicator {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: float 2s ease-in-out infinite;
+}
+
+/* ============================================
+   20. CUSTOM SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cardio-teal);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cardio-teal-light);
+}
+
+/* ============================================
+   21. UTILITY CLASSES
+   ============================================ */
+.text-gradient {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-blur-xl {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ============================================
+   22. RESPONSIVE HELPERS
+   ============================================ */
+@media (max-width: 768px) {
+  :root {
+    --section-padding: 4rem 1rem;
+  }
+
+  .mobile-menu {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:hidden {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* ============================================
+   23. ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .ecg-line,
+  .pulse-anim,
+  .float-anim,
+  .heartbeat,
+  .ripple,
+  .typing-dot {
+    animation: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--cardio-teal);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   24. PRINT STYLES
+   ============================================ */
+@media print {
+  .nav-link::after,
+  .ripple,
+  .float-anim,
+  .pulse-anim,
+  .heartbeat {
+    display: none;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+
+              </style>
+                        </head>
+                        <body>
+                            <style>
+  /* all the CSS */
+</style>
+<link rel="stylesheet" href="styles.css">
+
+
+              <script>
+                              
+              </script>
+                        </body>
+                        </html>
+                    
